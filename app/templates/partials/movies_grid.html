@@ -1,0 +1,8 @@
+{% if movies %}
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+  {% include "partials/movies_page.html" %}
+</div>
+<div class="text-muted small mt-3">{{ total }} result(s)</div>
+{% else %}
+<div class="alert alert-secondary">No movies found. Try refreshing the catalog or adjusting filters.</div>
+{% endif %}

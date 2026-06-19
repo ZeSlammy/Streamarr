@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Browse — Streamarr{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+  <h4 class="mb-0 me-auto"><i class="bi bi-search me-2"></i>Browse Catalog</h4>
+  <select id="cat-filter" name="category_id" class="form-select form-select-sm w-auto"
+          hx-get="/browse/results"
+          hx-target="#series-grid"
+          hx-swap="innerHTML"
+          hx-include="#search-input, #audio-filter, #sub-filter">
+    <option value="">All Categories</option>
+    {% for cat in categories %}
+      <option value="{{ cat.category_id }}">{{ cat.category_name }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<div class="row g-2 mb-4">
+  <div class="col-md-6">
+    <input id="search-input" name="q" type="search"
+           class="form-control"
+           placeholder="Search shows…"
+           hx-get="/browse/results"
+           hx-target="#series-grid"
+           hx-swap="innerHTML"
+           hx-trigger="input changed delay:300ms, search"
+           hx-include="#cat-filter, #audio-filter, #sub-filter"
+           autocomplete="off">
+  </div>
+  <div class="col-md-3">
+    <input id="audio-filter" name="audio_lang" type="search"
+           class="form-control"
+           placeholder="Audio language…"
+           hx-get="/browse/results"
+           hx-target="#series-grid"
+           hx-swap="innerHTML"
+           hx-trigger="input changed delay:400ms, search"
+           hx-include="#search-input, #cat-filter, #sub-filter"
+           autocomplete="off">
+  </div>
+  <div class="col-md-3">
+    <input id="sub-filter" name="sub_lang" type="search"
+           class="form-control"
+           placeholder="Subtitle language…"
+           hx-get="/browse/results"
+           hx-target="#series-grid"
+           hx-swap="innerHTML"
+           hx-trigger="input changed delay:400ms, search"
+           hx-include="#search-input, #cat-filter, #audio-filter"
+           autocomplete="off">
+  </div>
+</div>
+
+<div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+  <div class="text-muted small flex-grow-1">
+    <i class="bi bi-info-circle me-1"></i>
+    Language filters apply to shows whose details have been loaded. Click a show to load it, or backfill all in the background.
+  </div>
+  <button class="btn btn-outline-info btn-sm"
+          hx-post="/catalog/backfill"
+          hx-target="#backfill-status"
+          hx-swap="outerHTML">
+    <i class="bi bi-cloud-download me-1"></i>Backfill all details
+  </button>
+</div>
+
+<div id="backfill-status"
+     hx-get="/catalog/backfill/status"
+     hx-trigger="load"
+     hx-swap="outerHTML"
+     class="mb-3"></div>
+
+<div id="series-grid"
+     hx-get="/browse/results"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+  <div class="text-center py-5 text-muted">
+    <div class="spinner-border" role="status"></div>
+    <div class="mt-2">Loading catalog…</div>
+  </div>
+</div>
+
+{% endblock %}

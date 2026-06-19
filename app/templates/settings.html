@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Settings — Streamarr{% endblock %}
+{% block content %}
+
+<h4 class="mb-4"><i class="bi bi-gear me-2"></i>Settings</h4>
+
+{% if trakt_flash == 'connected' %}
+<div class="alert alert-success alert-dismissible fade show">
+  <i class="bi bi-check-circle me-2"></i>Trakt connected successfully.
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
+
+<!-- XTREAM Info (read-only — set via .env) -->
+<div class="card mb-4">
+  <div class="card-header fw-semibold"><i class="bi bi-broadcast me-2"></i>XTREAM Codes</div>
+  <div class="card-body">
+    <div class="mb-2">
+      <span class="text-muted small">Server URL</span>
+      <div class="font-monospace">{{ xtream_url }}</div>
+    </div>
+    <div class="mb-2">
+      <span class="text-muted small">Username</span>
+      <div class="font-monospace">{{ xtream_username }}</div>
+    </div>
+    <div class="mb-3">
+      <span class="text-muted small">Password</span>
+      <div class="font-monospace">••••••••</div>
+    </div>
+    <p class="text-muted small mb-2">Credentials are set via the <code>.env</code> file and require a container restart to change.</p>
+    <button class="btn btn-outline-primary btn-sm"
+            hx-post="/catalog/refresh"
+            hx-target="#toast-container"
+            hx-swap="innerHTML">
+      <i class="bi bi-cloud-download me-1"></i>Refresh Catalog from XTREAM
+    </button>
+  </div>
+</div>
+
+<!-- Provider URLs -->
+<div class="card mb-4">
+  <div class="card-header d-flex align-items-center fw-semibold">
+    <i class="bi bi-shuffle me-2"></i>Provider URLs
+    <button class="btn btn-outline-primary btn-sm ms-auto"
+            hx-post="/providers/check"
+            hx-target="#toast-container"
+            hx-swap="innerHTML">
+      <i class="bi bi-activity me-1"></i>Check now
+    </button>
+  </div>
+  <div class="card-body p-0">
+    <div hx-get="/providers/status" hx-trigger="load, every 5s" hx-swap="innerHTML">
+      <div class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Library -->
+<div class="card mb-4">
+  <div class="card-header fw-semibold"><i class="bi bi-folder me-2"></i>Library</div>
+  <div class="card-body">
+    <div class="mb-2">
+      <span class="text-muted small">Library path (inside container)</span>
+      <div class="font-monospace">{{ library_path }}</div>
+    </div>
+    <p class="text-muted small mb-0">
+      This volume is shared with Jellyfin / Kodi. Point both at the same host path defined in <code>LIBRARY_PATH</code> in your <code>.env</code>.
+    </p>
+  </div>
+</div>
+
+<!-- Trakt -->
+<div class="card mb-4">
+  <div class="card-header fw-semibold"><i class="bi bi-graph-up me-2"></i>Trakt</div>
+  <div class="card-body">
+    {% if trakt_connected %}
+      <div class="d-flex align-items-center gap-3 flex-wrap">
+        <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i>Connected</span>
+        <button class="btn btn-outline-danger btn-sm"
+                hx-post="/trakt/disconnect"
+                hx-target="#toast-container"
+                hx-swap="innerHTML"
+                hx-confirm="Disconnect Trakt?">
+          Disconnect
+        </button>
+        <button class="btn btn-outline-primary btn-sm"
+                hx-post="/trakt/import-watchlist"
+                hx-target="#toast-container"
+                hx-swap="innerHTML">
+          <i class="bi bi-bookmark-plus me-1"></i>Import Watchlist
+        </button>
+        <button class="btn btn-outline-primary btn-sm"
+                hx-post="/trakt/import-watched"
+                hx-target="#toast-container"
+                hx-swap="innerHTML"
+                hx-confirm="Subscribe to every show you've ever scrobbled on Trakt that matches the catalog?">
+          <i class="bi bi-clock-history me-1"></i>Import Watched
+        </button>
+      </div>
+      <p class="text-muted small mt-3 mb-0">
+        <strong>Watchlist</strong> imports the shows you've manually flagged on Trakt.
+        <strong>Watched</strong> imports every unique show you've ever scrobbled —
+        useful if you use Trakt as a scrobbler rather than a curation tool.
+        For scrobbling, install the <strong>Trakt plugin</strong> in Jellyfin or the <strong>Trakt addon</strong> in Kodi.
+      </p>
+    {% else %}
+      <p class="mb-3">Connect your Trakt account to import your watchlist into subscriptions.</p>
+      <a href="/trakt/connect" class="btn btn-primary">
+        <i class="bi bi-link-45deg me-1"></i>Connect Trakt
+      </a>
+      <p class="text-muted small mt-3 mb-0">
+        You need a free Trakt API app. Create one at
+        <a href="https://trakt.tv/oauth/applications" target="_blank">trakt.tv/oauth/applications</a>
+        and set <code>TRAKT_CLIENT_ID</code>, <code>TRAKT_CLIENT_SECRET</code>, and
+        <code>TRAKT_REDIRECT_URI</code> in your <code>.env</code>.
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Sync History -->
+<div class="card">
+  <div class="card-header fw-semibold"><i class="bi bi-clock-history me-2"></i>Sync History</div>
+  <div class="card-body p-0">
+    <div hx-get="/sync/status" hx-trigger="load, every 5s" hx-swap="innerHTML">
+      <div class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm"></div></div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

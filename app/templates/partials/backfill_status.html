@@ -1,0 +1,29 @@
+{% set s = state %}
+<div id="backfill-status"
+     {% if s.running %}
+     hx-get="/catalog/backfill/status"
+     hx-trigger="every 3s"
+     hx-swap="outerHTML"
+     {% endif %}>
+  {% if s.running %}
+    {% set pct = (s.done / s.total * 100) if s.total else 0 %}
+    <div class="d-flex align-items-center gap-2 small">
+      <div class="spinner-border spinner-border-sm text-info"></div>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between text-muted" style="font-size:.75rem">
+          <span>Backfilling show details…</span>
+          <span>{{ s.done }} / {{ s.total }}{% if s.errors %} · {{ s.errors }} err{% endif %}</span>
+        </div>
+        <div class="progress" style="height:4px">
+          <div class="progress-bar bg-info" role="progressbar"
+               style="width: {{ '%.1f' | format(pct) }}%"></div>
+        </div>
+      </div>
+    </div>
+  {% elif s.finished_at %}
+    <div class="alert alert-success py-2 small mb-0">
+      <i class="bi bi-check-circle me-1"></i>
+      Backfill complete — {{ s.done }} processed{% if s.errors %}, {{ s.errors }} errors{% endif %}.
+    </div>
+  {% endif %}
+</div>

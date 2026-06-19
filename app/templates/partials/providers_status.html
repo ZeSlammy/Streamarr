@@ -1,0 +1,94 @@
+{% if running %}
+<div class="d-flex align-items-center gap-2 px-3 py-2 text-warning">
+  <div class="spinner-border spinner-border-sm"></div>
+  Probing URLs…
+</div>
+{% endif %}
+
+<div class="px-3 py-3">
+  <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
+    <div>
+      <div class="text-muted small">Current upstream</div>
+      {% if state.current %}
+        <code class="text-success">{{ state.current }}</code>
+      {% else %}
+        <em class="text-muted">none</em>
+      {% endif %}
+    </div>
+    {% if mirror_url %}
+    <div>
+      <div class="text-muted small">Mirror URL (point clients here)</div>
+      <code class="text-info">{{ mirror_url }}/xtream</code>
+      <span class="text-muted small ms-1">— u/p: <code>{{ mirror_user }}</code> / <code>{{ mirror_pass }}</code></span>
+    </div>
+    {% endif %}
+    <div class="ms-auto text-muted small">
+      {% if next_run %}
+        Next scheduled run: <span class="text-light">{{ next_run.strftime('%a %d %b %H:%M %Z') }}</span>
+      {% else %}
+        Scheduler disabled.
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="text-muted small mb-1">Candidates ({{ state.candidates|length }})</div>
+      {% if state.candidates %}
+        <ul class="list-unstyled font-monospace small mb-0">
+          {% for c in state.candidates %}
+            <li>{{ c }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <em class="text-muted small">none</em>
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      <div class="text-muted small mb-1">Burned ({{ state.burned|length }})</div>
+      {% if state.burned %}
+        <ul class="list-unstyled font-monospace small mb-0 text-danger">
+          {% for b in state.burned %}
+            <li>{{ b }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <em class="text-muted small">none</em>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if summary %}
+  <hr>
+  <div class="small">
+    <div class="text-muted mb-1">Last check — {{ summary.checked_at }}</div>
+    {% if summary.error %}
+      <div class="text-danger">Error: {{ summary.error }}</div>
+    {% else %}
+      <div>
+        Result:
+        {% if summary.swapped %}
+          <span class="badge bg-warning text-dark">swapped</span>
+        {% else %}
+          <span class="badge bg-success">no change</span>
+        {% endif %}
+        <span class="text-muted ms-2">{{ summary.reason }}</span>
+      </div>
+      {% if summary.tried %}
+        <ul class="mt-2 mb-0 font-monospace">
+          {% for t in summary.tried %}
+            <li>
+              {% if t.alive %}
+                <span class="text-success">✓</span>
+              {% else %}
+                <span class="text-danger">✗</span>
+              {% endif %}
+              {{ t.url }} — <span class="text-muted">{{ t.reason }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endif %}
+  </div>
+  {% endif %}
+</div>

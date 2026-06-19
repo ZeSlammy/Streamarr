@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Movies — Streamarr{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+  <h4 class="mb-0 me-auto"><i class="bi bi-film me-2"></i>Movies</h4>
+  <span class="badge bg-secondary">{{ catalog_total }} in catalog</span>
+  <span class="badge bg-success">{{ in_library_count }} in library</span>
+  <a href="/collections" class="btn btn-outline-info btn-sm">
+    <i class="bi bi-collection-play me-1"></i>Collections
+  </a>
+  <button class="btn btn-outline-primary btn-sm"
+          hx-post="/movies/catalog/refresh"
+          hx-target="#toast-container"
+          hx-swap="innerHTML">
+    <i class="bi bi-cloud-download me-1"></i>Refresh catalog
+  </button>
+  <button class="btn btn-outline-warning btn-sm"
+          hx-post="/movies/backfill"
+          hx-target="#movies-backfill-status"
+          hx-swap="outerHTML">
+    <i class="bi bi-magic me-1"></i>Enrich (TMDB)
+  </button>
+</div>
+
+<div id="movies-backfill-status"
+     hx-get="/movies/backfill/status"
+     hx-trigger="load"
+     hx-swap="outerHTML"
+     class="mb-3"></div>
+
+<div class="row g-2 mb-3">
+  <div class="col-md-6">
+    <input id="m-search-input" name="q" type="search"
+           class="form-control"
+           placeholder="Search movies…"
+           hx-get="/movies/results"
+           hx-target="#movies-grid"
+           hx-swap="innerHTML"
+           hx-trigger="input changed delay:300ms, search"
+           hx-include="#m-cat-filter, #m-library-only"
+           autocomplete="off">
+  </div>
+  <div class="col-md-4">
+    <select id="m-cat-filter" name="category_id" class="form-select"
+            hx-get="/movies/results"
+            hx-target="#movies-grid"
+            hx-swap="innerHTML"
+            hx-include="#m-search-input, #m-library-only">
+      <option value="">All Genres</option>
+      {% for cat in categories %}
+        <option value="{{ cat.category_id }}">{{ cat.category_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2 d-flex align-items-center">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="m-library-only" name="library_only" value="1"
+             hx-get="/movies/results"
+             hx-target="#movies-grid"
+             hx-swap="innerHTML"
+             hx-include="#m-search-input, #m-cat-filter">
+      <label class="form-check-label" for="m-library-only">My library only</label>
+    </div>
+  </div>
+</div>
+
+<div class="row g-2 mb-3">
+  <div class="col-md-6">
+    <div class="input-group">
+      <span class="input-group-text">
+        <i class="bi bi-person-circle"></i>
+      </span>
+      <input id="m-actor-input" name="q" type="search"
+             class="form-control"
+             placeholder="Search by actor (TMDB-enriched)…"
+             hx-get="/movies/search/actor"
+             hx-target="#movies-grid"
+             hx-swap="innerHTML"
+             hx-trigger="input changed delay:400ms, search"
+             autocomplete="off">
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="input-group">
+      <span class="input-group-text">
+        <i class="bi bi-megaphone"></i>
+      </span>
+      <input id="m-director-input" name="q" type="search"
+             class="form-control"
+             placeholder="Search by director (TMDB-enriched)…"
+             hx-get="/movies/search/director"
+             hx-target="#movies-grid"
+             hx-swap="innerHTML"
+             hx-trigger="input changed delay:400ms, search"
+             autocomplete="off">
+    </div>
+  </div>
+</div>
+
+<div id="movies-grid"
+     hx-get="/movies/results?library_only=1"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+  <div class="text-center py-5 text-muted">
+    <div class="spinner-border" role="status"></div>
+    <div class="mt-2">Loading movies…</div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% for m in movies %}
+  {% include "partials/movie_card.html" %}
+{% endfor %}
+{% if has_more %}
+  <div class="col-12 text-center py-3"
+       hx-get="/movies/results?offset={{ next_offset }}&q={{ q | urlencode }}&category_id={{ category_id | urlencode }}&library_only={{ library_only | urlencode }}"
+       hx-trigger="intersect once"
+       hx-swap="outerHTML">
+    <div class="spinner-border spinner-border-sm text-secondary"></div>
+    <span class="text-muted ms-2">Loading more…</span>
+  </div>
+{% endif %}

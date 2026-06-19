@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}My Shows — Streamarr{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center mb-4">
+  <h4 class="mb-0 me-auto"><i class="bi bi-bookmark-heart me-2"></i>My Shows</h4>
+  <button class="btn btn-success btn-sm"
+          hx-post="/sync"
+          hx-target="#toast-container"
+          hx-swap="innerHTML">
+    <i class="bi bi-arrow-repeat me-1"></i>Sync All
+  </button>
+</div>
+
+{% if series_list %}
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+  {% for s in series_list %}
+    {% include "partials/series_card.html" %}
+  {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+  <i class="bi bi-info-circle me-2"></i>
+  No subscriptions yet. <a href="/browse">Browse the catalog</a> to add shows.
+</div>
+{% endif %}
+
+{% endblock %}

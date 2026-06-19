@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Streamarr{% endblock %}
+{% block content %}
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="fs-1 fw-bold text-primary">{{ subscribed_count }}</div>
+        <div class="text-muted">Subscribed Shows</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="fs-1 fw-bold text-secondary">{{ total_series }}</div>
+        <div class="text-muted">Total in Catalog</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card text-center">
+      <div class="card-body">
+        {% if last_log %}
+          <div class="fs-6 fw-bold {% if last_log.status == 'done' %}text-success{% elif last_log.status == 'error' %}text-danger{% else %}text-warning{% endif %}">
+            {{ last_log.status | upper }}
+          </div>
+          <div class="text-muted small">Last sync: {{ last_log.started_at.strftime('%d %b %Y %H:%M') }}</div>
+          {% if last_log.status == 'done' %}
+            <div class="text-muted small">+{{ last_log.files_created }} files / -{{ last_log.files_removed }} removed</div>
+          {% endif %}
+          {% if last_log.message %}
+            <div class="text-danger small mt-1">{{ last_log.message }}</div>
+          {% endif %}
+        {% else %}
+          <div class="text-muted">No sync run yet</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h5 class="mb-0">Quick Actions</h5>
+</div>
+<div class="d-flex gap-2 mb-4 flex-wrap">
+  <button class="btn btn-outline-primary"
+          hx-post="/catalog/refresh"
+          hx-target="#toast-container"
+          hx-swap="innerHTML"
+          hx-indicator="#refresh-spinner">
+    <span id="refresh-spinner" class="spinner-border spinner-border-sm d-none me-1" role="status"></span>
+    <i class="bi bi-cloud-download me-1"></i>Refresh Catalog
+  </button>
+  <a href="/browse" class="btn btn-outline-secondary"><i class="bi bi-search me-1"></i>Browse &amp; Subscribe</a>
+  <a href="/my-shows" class="btn btn-outline-secondary"><i class="bi bi-bookmark-heart me-1"></i>My Shows</a>
+  <button class="btn btn-success"
+          hx-post="/sync"
+          hx-target="#toast-container"
+          hx-swap="innerHTML">
+    <i class="bi bi-arrow-repeat me-1"></i>Sync Now
+  </button>
+</div>
+
+{% if total_series == 0 %}
+<div class="alert alert-info">
+  <i class="bi bi-info-circle me-2"></i>
+  Catalog is empty. Click <strong>Refresh Catalog</strong> to fetch all series from your XTREAM provider.
+</div>
+{% endif %}
+
+{% if recent_synced %}
+<h5 class="mb-3">Recently Synced</h5>
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+  {% for s in recent_synced %}
+    {% include "partials/series_card.html" %}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

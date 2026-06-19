@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Collections — Streamarr{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+  <h4 class="mb-0 me-auto"><i class="bi bi-collection-play me-2"></i>Collections</h4>
+  <span class="badge bg-secondary">{{ collections | length }} collections</span>
+  <a href="/movies" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-film me-1"></i>Back to Movies
+  </a>
+</div>
+
+{% if not collections %}
+  <div class="alert alert-info">
+    No collections discovered yet. Run a TMDB enrichment pass from the Movies page,
+    then come back — collections are derived from <code>belongs_to_collection</code>
+    on enriched films.
+  </div>
+{% else %}
+  <div class="row row-cols-1 row-cols-md-2 g-3">
+    {% for c in collections %}
+      {% include "partials/collection_card.html" %}
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% endblock %}

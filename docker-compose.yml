@@ -1,0 +1,22 @@
+services:
+  streamarr:
+    build: ./app
+    container_name: streamarr
+    restart: unless-stopped
+    ports:
+      - "8011:8000"
+    env_file: .env
+    volumes:
+      - streamarr-data:/data
+      - ${LIBRARY_PATH}:/library
+      - ${LIBRARY_PATH_MOVIES}:/library_movies
+      - ./URL.md:/data/URL.md
+    environment:
+      - LIBRARY_PATH=/library
+      - LIBRARY_PATH_MOVIES=/library_movies
+      - DB_PATH=/data/db.sqlite
+      - PROVIDERS_FILE=/data/URL.md
+      - TZ=Europe/Paris
+
+volumes:
+  streamarr-data:

@@ -1,0 +1,50 @@
+{% if running %}
+<div class="d-flex align-items-center gap-2 px-3 py-2 text-warning">
+  <div class="spinner-border spinner-border-sm"></div>
+  Sync in progress…
+</div>
+{% endif %}
+
+{% if logs %}
+<table class="table table-sm table-hover mb-0">
+  <thead>
+    <tr>
+      <th>Started</th>
+      <th>Status</th>
+      <th>Shows</th>
+      <th>Created</th>
+      <th>Removed</th>
+      <th>Duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in logs %}
+    <tr>
+      <td class="text-muted small">{{ log.started_at.strftime('%d %b %H:%M') }}</td>
+      <td>
+        <span class="badge {% if log.status == 'done' %}bg-success{% elif log.status == 'error' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+          {{ log.status }}
+        </span>
+      </td>
+      <td>{{ log.series_processed }}</td>
+      <td class="text-success">+{{ log.files_created }}</td>
+      <td class="text-danger">-{{ log.files_removed }}</td>
+      <td class="text-muted small">
+        {% if log.finished_at %}
+          {{ ((log.finished_at - log.started_at).total_seconds() | int) }}s
+        {% else %}
+          —
+        {% endif %}
+      </td>
+    </tr>
+    {% if log.message %}
+    <tr>
+      <td colspan="6" class="text-danger small">{{ log.message }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="px-3 py-2 text-muted small">No syncs run yet.</div>
+{% endif %}

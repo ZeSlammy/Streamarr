@@ -1,0 +1,58 @@
+<table class="table table-sm table-dark mb-0">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Title</th>
+      <th class="text-end">Released</th>
+      <th class="text-end" style="width: 11rem">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+      <tr>
+        <td style="width: 3rem">
+          {% if r.part.poster_path %}
+            <img src="https://image.tmdb.org/t/p/w92{{ r.part.poster_path }}"
+                 style="height: 2.2rem; border-radius: 3px" alt="">
+          {% endif %}
+        </td>
+        <td class="align-middle small">{{ r.part.title }}</td>
+        <td class="align-middle text-muted small text-end">
+          {{ (r.part.release_date or '')[:4] }}
+        </td>
+        <td class="text-end align-middle">
+          {% if r.in_library %}
+            <button class="btn btn-danger btn-sm"
+                    hx-post="/movies/{{ r.movie.vod_id }}/remove"
+                    hx-swap="none"
+                    title="Remove from library">
+              <i class="bi bi-bookmark-dash"></i>
+            </button>
+          {% elif r.in_catalog %}
+            <button class="btn btn-primary btn-sm"
+                    hx-post="/movies/{{ r.movie.vod_id }}/add"
+                    hx-swap="none"
+                    title="Add to library">
+              <i class="bi bi-bookmark-plus"></i>
+            </button>
+          {% elif r.requested %}
+            <button class="btn btn-success btn-sm" disabled>
+              <i class="bi bi-check2-circle me-1"></i>Requested
+            </button>
+          {% elif radarr_enabled %}
+            <button class="btn btn-warning btn-sm"
+                    id="request-{{ r.part.tmdb_id }}"
+                    hx-post="/movies/request/{{ r.part.tmdb_id }}"
+                    hx-target="#request-{{ r.part.tmdb_id }}"
+                    hx-swap="outerHTML"
+                    title="Send to Radarr">
+              <i class="bi bi-radar me-1"></i>Request
+            </button>
+          {% else %}
+            <span class="text-muted small">Not available</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

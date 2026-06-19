@@ -1,0 +1,32 @@
+<div id="movies-backfill-status"
+     hx-get="/movies/backfill/status"
+     hx-trigger="every 3s"
+     hx-swap="outerHTML">
+  {% if not tmdb_enabled %}
+    <div class="alert alert-warning small mb-0">
+      <i class="bi bi-key me-1"></i>TMDB_API_KEY is not set — enrichment disabled.
+    </div>
+  {% elif status.running %}
+    <div class="alert alert-info small mb-0">
+      <i class="bi bi-cloud-download me-1"></i>
+      Enriching… {{ status.processed }} / {{ status.total_candidates }}
+      {% if status.failed %}<span class="text-warning">({{ status.failed }} failed)</span>{% endif %}
+      <div class="progress mt-1" style="height: .4rem">
+        <div class="progress-bar"
+             role="progressbar"
+             style="width: {% if status.total_candidates %}{{ (status.processed / status.total_candidates * 100) | round(0) }}{% else %}0{% endif %}%"></div>
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-secondary small mb-0">
+      <i class="bi bi-database me-1"></i>
+      TMDB enrichment: {{ enriched_count or 0 }} / {{ total_with_tmdb or 0 }} films enriched
+      {% if status.finished_at %}
+        <span class="text-muted">— last run {{ status.processed }} processed, {{ status.failed }} failed</span>
+      {% endif %}
+      {% if status.last_error %}
+        <div class="text-warning small mt-1">{{ status.last_error[:200] }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>

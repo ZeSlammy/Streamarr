@@ -1,0 +1,46 @@
+<div class="col" id="movie-{{ m.vod_id }}">
+  <div class="card card-series h-100">
+    {% if m.cover %}
+      <img src="{{ m.cover }}" class="cover-img card-img-top" loading="lazy" alt="{{ m.name }}"
+           onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'cover-placeholder',innerHTML:'<i class=\'bi bi-film\'></i>'}))">
+    {% else %}
+      <div class="cover-placeholder"><i class="bi bi-film"></i></div>
+    {% endif %}
+    <div class="card-body p-2 d-flex flex-column">
+      <div class="small fw-semibold mb-1 text-truncate" title="{{ m.name }}">{{ m.name }}</div>
+      {% if m.rating_5based %}
+        <div class="text-warning small mb-1">
+          {% for _ in range(m.rating_5based | int) %}<i class="bi bi-star-fill"></i>{% endfor %}
+          {% if m.rating_5based % 1 >= 0.5 %}<i class="bi bi-star-half"></i>{% endif %}
+        </div>
+      {% endif %}
+      <div class="d-flex align-items-center gap-1 mb-1" style="min-height:1.2rem">
+        {% if m.release_year %}
+          <span class="text-muted" style="font-size:.7rem">{{ m.release_year }}</span>
+        {% endif %}
+        {% if m.genre %}
+          <span class="badge bg-info text-dark text-truncate" style="font-size:.6rem; max-width:7rem" title="{{ m.genre }}">
+            {{ m.genre }}
+          </span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="px-2 pb-2">
+      {% if m.in_library %}
+        <button class="btn btn-danger btn-sm w-100"
+                hx-post="/movies/{{ m.vod_id }}/remove"
+                hx-target="#movie-{{ m.vod_id }}"
+                hx-swap="outerHTML">
+          <i class="bi bi-bookmark-dash me-1"></i>Remove
+        </button>
+      {% else %}
+        <button class="btn btn-primary btn-sm w-100"
+                hx-post="/movies/{{ m.vod_id }}/add"
+                hx-target="#movie-{{ m.vod_id }}"
+                hx-swap="outerHTML">
+          <i class="bi bi-bookmark-plus me-1"></i>Add
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</div>

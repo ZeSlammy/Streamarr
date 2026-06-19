@@ -1,0 +1,23 @@
+# Secrets — never commit
+.env
+
+# Live provider URL list — contains your active provider URL, managed by the app
+# Commit URL.md.example instead; copy to URL.md on first setup
+URL.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+*.egg-info/
+
+# DB + data
+*.sqlite
+*.db
+
+# Logs
+*.log
+
+# OS
+.DS_Store
