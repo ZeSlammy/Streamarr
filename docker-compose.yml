@@ -1,6 +1,8 @@
 services:
   streamarr:
-    build: ./app
+    image: zeslammy/streamarr:latest
+    # Uncomment to build from source instead of pulling the pre-built image:
+    # build: ./app
     container_name: streamarr
     restart: unless-stopped
     ports:
