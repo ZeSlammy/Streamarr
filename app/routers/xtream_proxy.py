@@ -35,7 +35,7 @@ from models import Category, Movie, MovieCategory, Series
 from services.providers import run_failover_check
 
 router = APIRouter(prefix="/xtream", tags=["mirror"])
-logger = logging.getLogger("streamarr.proxy")
+logger = logging.getLogger("xtream-picker.proxy")
 
 # Opportunistic failover state — single-flight + cooldown so concurrent failing
 # requests don't each kick off their own ~10s probe of every candidate URL.
@@ -492,7 +492,9 @@ async def _ffmpeg_proxy(upstream_url: str):
         "-i", upstream_url,
         "-c", "copy",
         "-avoid_negative_ts", "make_zero",
-        "-map", "0",
+        "-map", "0:v?",
+        "-map", "0:a?",
+        "-sn",
         "-f", "matroska",
         "pipe:1",
         stdout=asyncio.subprocess.PIPE,
